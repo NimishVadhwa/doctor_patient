@@ -3,6 +3,8 @@ const route = express.Router();
 const auth = require('./middleware/auth');
 const AuthController = require('./controller/AuthController');
 const DoctorController = require('./controller/DoctorController');
+const PatientController = require('./controller/PatientController');
+
 const multer = require('multer');
 
 let storage_user = multer.diskStorage({
@@ -40,12 +42,19 @@ route.get('/user/detail', auth, AuthController.detail); // user detail
 
 route.post('/user/all-list', auth, AuthController.all_list);
 route.post('/user/block', auth, AuthController.block_user);
+route.post('/user/edit-profile', auth, upload_user.single('image'), AuthController.edit_profile);
 
 route.post('/doctor/add-schedule', auth, DoctorController.add_schedule);
-route.get('/doctor/schedule-list/:id', auth, DoctorController.schedule_list_doctor);
+route.post('/doctor/schedule-list', auth, DoctorController.schedule_list_doctor);
 route.post('/doctor/schedule-date', auth, DoctorController.schedule_by_date);
+route.post('/doctor/schedule-id', auth, DoctorController.schedule_by_id);
 
-route.post('/user/edit-profile', auth, upload_user.single('image'), AuthController.edit_profile);
+route.post('/doctor/add-holiday', auth, DoctorController.add_holiday);
+route.post('/doctor/remove-holiday', auth, DoctorController.remove_holiday);
+
+
+
+route.post('/booking/time-list', auth, PatientController.time_list);
 
 
 

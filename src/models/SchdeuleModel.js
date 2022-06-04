@@ -1,6 +1,7 @@
 const { Model, DataTypes } = require('sequelize');
 const database = require('../database');
-const s_date = require('./Schedule_dateModel');
+const s_date = require('./Calender_dateModel');
+const user = require('./UserModel');
 
 class schedule extends Model { }
 
@@ -19,11 +20,6 @@ schedule.init(
         end_time: {
             type: DataTypes.TIME,
             allowNull: false
-        },
-        status: {
-            type: DataTypes.ENUM('upcoming', 'ongoing', 'completed','cancel'),
-            allowNull: false,
-            defaultValue: 'upcoming'
         }
     },
     {
@@ -38,5 +34,7 @@ schedule.init(
 s_date.hasMany(schedule, { onDelete: "CASCADE", foreignKey: "s_date_id" });
 schedule.belongsTo(s_date, { foreignKey: "s_date_id" });
 
+user.hasMany(schedule, { onDelete: "CASCADE", foreignKey: "doctor_id" });
+schedule.belongsTo(user, { foreignKey: "doctor_id" });
 
 module.exports = schedule;

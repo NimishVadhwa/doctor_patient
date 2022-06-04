@@ -1,13 +1,11 @@
 const sgMail = require('@sendgrid/mail')
-// sgMail.setApiKey('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');
-sgMail.setApiKey('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');
-
+sgMail.setApiKey('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'); // vadhwanimish20@gmail.com
 
 exports.sendEmail = async (to, subject, data) => {
 
     const msg = {
         to: to, // Change to your recipient
-        from: 'website@transform.vc',
+        from: 'vadhwanimish20@gmail.com',
         subject: subject,
         html: data,
     }
