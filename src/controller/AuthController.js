@@ -109,6 +109,7 @@ exports.register = async (req, res, next) => {
         email: joi.string().required().email(),
         password: joi.string().allow(''),
         phone: joi.number().required(),
+        gender: joi.string().required().valid('Male', 'Female', 'other'),
         type: joi.string().required().valid('patient','doctor')
     });
 
@@ -129,7 +130,8 @@ exports.register = async (req, res, next) => {
         });
 
         await user_profile.create({
-                user_id : u_id.id
+                user_id : u_id.id,
+                gender : req.body.gender
         });
 
         if(req.body.type == 'doctor')
@@ -161,7 +163,7 @@ exports.register = async (req, res, next) => {
 exports.detail = async (req, res, next) => {
 
     const data = await user.findOne({
-        where: { id: req.user_id },
+        where: { id: req.params.id },
         include:[{
             model:user_profile
         }]
@@ -171,6 +173,23 @@ exports.detail = async (req, res, next) => {
         data: data,
         status: true,
         message: "Detail"
+    });
+
+}
+
+exports.detail_by_token = async (req, res, next) => {
+
+    const data = await user.findOne({
+        where: { id: req.user_id },
+        include: [{
+            model: user_profile
+        }]
+    });
+
+    return res.status(200).json({
+        data: data,
+        status: true,
+        message: "User Detail"
     });
 
 }
@@ -319,6 +338,8 @@ exports.edit_profile = async(req,res,next)=>{
     const schema = joi.object({
         age:joi.number().required(),
         address : joi.string().required(),
+        first_name: joi.string().required(),
+        last_name: joi.string().required(),
         specility : joi.string().allow(null),
         experience : joi.string().allow(null),
         education: joi.string().allow(null),
@@ -338,6 +359,8 @@ exports.edit_profile = async(req,res,next)=>{
 
         if(req.file)
         {
+            check.first_name = req.file.first_name;
+            check.last_name = req.body.last_name;
             check.image = req.file.path;
             await check.save();
         }

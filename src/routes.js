@@ -38,23 +38,36 @@ route.post('/auth/forget-password', AuthController.forget_password);
 route.post('/auth/change-password', AuthController.change_password);
 route.get('/auth/logout', auth, AuthController.logout);
 
-route.get('/user/detail', auth, AuthController.detail); // user detail
+route.get('/user/detail/:id', AuthController.detail); // user detail by id
+route.get('/user/user-detail', auth, AuthController.detail_by_token); // user detail by token
+
 
 route.post('/user/all-list', auth, AuthController.all_list);
 route.post('/user/block', auth, AuthController.block_user);
 route.post('/user/edit-profile', auth, upload_user.single('image'), AuthController.edit_profile);
 
+//schedule list
 route.post('/doctor/add-schedule', auth, DoctorController.add_schedule);
-route.post('/doctor/schedule-list', auth, DoctorController.schedule_list_doctor);
-route.post('/doctor/schedule-date', auth, DoctorController.schedule_by_date);
-route.post('/doctor/schedule-id', auth, DoctorController.schedule_by_id);
 
+route.post('/doctor/schedule-list', auth, DoctorController.schedule_list_doctor);
+route.post('/doctor/schedule-single-date', auth, DoctorController.schedule_by_single_date);
+
+route.post('/doctor/calender', auth, DoctorController.calender);
+route.post('/doctor/doctor-list', auth, DoctorController.get_doctor_list);
+
+
+//holiday
 route.post('/doctor/add-holiday', auth, DoctorController.add_holiday);
 route.post('/doctor/remove-holiday', auth, DoctorController.remove_holiday);
+route.get('/doctor/holiday-list', auth, DoctorController.holiday_list);
 
 
-
+// Booking slot
 route.post('/booking/time-list', auth, PatientController.time_list);
+route.post('/booking/booking', auth, PatientController.booking);
+
+route.get('/admin/request-list', auth, PatientController.request_list);
+route.post('/admin/assign-doctor', auth, PatientController.assign_doctor);
 
 
 
