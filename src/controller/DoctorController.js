@@ -3,9 +3,10 @@ const user = require('../models/UserModel');
 const schedule = require('../models/SchdeuleModel');
 const calender = require('../models/Calender_dateModel');
 const user_profile = require('../models/User_profileModel');
-const booking = require('../models/BookingModel')
+const booking = require('../models/BookingModel');
+const re_schedule = require('../models/Re_scheduleModel');
 
-exports.add_schedule = async (req, res, next) => {
+exports.add_schedule = async (req, res, next) => {2
 
     const schema = joi.object({
         doctor_id : joi.number().required(),
@@ -37,7 +38,7 @@ exports.add_schedule = async (req, res, next) => {
             await schedule.create({
                 start_time : element.start,
                 end_time: element.end,
-                s_date_id: row.id,
+                calender_id : row.id,
                 doctor_id: req.body.doctor_id
             });
 
@@ -115,7 +116,7 @@ exports.calender = async(req, res, next)=>{
                 // include:[{
                 //     model:user
                 // }],
-                // group: ['schedules.doctor_id','schedules.s_date_id'],
+                // group: ['schedules.doctor_id','schedules.calender_id'],
             }],
         });
 
@@ -158,7 +159,7 @@ exports.get_doctor_list = async(req, res, next)=>{
         }
 
         const data = await schedule.findAll({
-            where : { s_date_id : cal.id },
+            where: { calender_id: cal.id },
             attributes:['doctor_id'],
             group:['doctor_id'],
             include: [{
@@ -204,7 +205,7 @@ exports.schedule_by_single_date= async (req, res, next) => {
         }
 
         const data = await schedule.findAll({
-            where : { doctor_id : req.body.doctor_id, s_date_id : cal.id },
+            where: { doctor_id: req.body.doctor_id, calender_id: cal.id },
             include:[{
                 model:booking,
                 include:[{
@@ -251,7 +252,7 @@ exports.add_holiday = async (req, res, next) => {
         if(!created)
         {
             const check = await schedule.findOne({
-                where: { s_date_id: row.id }
+                where: { calender_id: row.id }
             });
 
             if(check) throw new Error('Schedule is added');
@@ -316,6 +317,158 @@ exports.holiday_list = async(req, res, next)=>{
 
     } catch (err) {
         err.status = 500;
+        next(err);
+    }
+
+}
+
+exports.apply_reschedule = async (req, res, next) => {
+
+    const schema = joi.object({
+        start_time : joi.string().required(),
+        end_time: joi.string().required(),
+        user_id : joi.number().required(),
+        slot_id : joi.number().allow(null),
+        re_schedule_date : joi.string().required(),
+        booking_id : joi.number().allow(null)
+    });
+
+    try {
+        
+        await schema.validateAsync(req.body);
+
+        let dta = new Date(req.body.re_schedule_date);
+
+        const [row, created] = await calender.findOrCreate({
+            where: { date: dta.toISOString().split('T')[0] },
+            defaults: {
+                date: dta.toISOString().split('T')[0],
+                year: dta.getFullYear(),
+                month: dta.getMonth() + 1
+            }
+        });
+
+        await re_schedule.create({
+            old_start_time : req.body.start_time,
+            old_end_time: req.body.end_time,
+            calender_id : row.id,
+            schedule_id : req.body.slot_id,
+            user_id :req.body.user_id,
+            booking_id : req.body.booking_id
+        });
+
+        return res.status(200).json({
+            data: [],
+            status: true,
+            message: "Re-schedule apply successfully"
+        });
+        
+    } catch (err) {
+        err.status = 400;
+        next(err);
+    }
+
+
+}
+
+exports.re_schedule_list = async(req, res, next)=>{
+
+    try {
+
+        const data = await re_schedule.findAll({
+            where : { is_reschedule:'0' },
+            include: [{
+                model:booking
+            }]
+        });
+        
+        return res.status(200).json({
+            data: data,
+            status: true,
+            message: "Re-schdule apply list"
+        });
+
+    } catch (err) {
+        err.status =400;
+        next(err);
+    }
+
+}
+
+exports.re_schedule_confirm = async (req, res, next) => {
+
+    const schema = joi.object({
+        re_schedule_id : joi.number().required(),
+        status : joi.string().required().valid('1','2')
+    });
+
+    try {
+
+        await schema.validateAsync(req.body);
+
+        const check = await re_schedule.findOne({ where: { id: req.body.re_schedule_id } });
+
+        const data = await schedule.findOne({ where: { id: check.schedule_id } });
+
+        if(req.body.statsu == '1')
+        {
+            let st_time = data.start_time;
+            let ed_time = data.end_time;
+            let cal_id = data.calender_id;
+
+            data.start_time = check.old_start_time;
+            data.end_time = check.old_end_time;
+            await data.save();
+    
+            check.old_start_time = st_time;
+            check.old_end_time = ed_time;
+            check.calender_id = cal_id;
+
+        }
+
+
+        check.is_reschedule = req.body.status;
+        await check.save();
+
+        
+        return res.status(200).json({
+            data: [],
+            status: true,
+            message: "Successfull"
+        });
+
+    } catch (err) {
+        err.status = 400;
+        next(err);
+    }
+
+}
+
+exports.feedback_booking = async (req, res, next) => {
+
+    const schema = joi.object({
+        feedback: joi.string().required(),
+        booking_id: joi.number().required()
+    });
+
+    try {
+        await schema.validateAsync(req.body);
+
+        await booking.update({
+            feedback: req.body.feedback,
+            is_come : '1'
+        }, {
+            where: { id: req.body.booking_id }
+        });
+
+        return res.status(200).json({
+            data: [],
+            status: true,
+            message: "Feedback add Successfull"
+        });
+
+    } catch (err) {
+        err.status = 400;
         next(err);
     }
 

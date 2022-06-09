@@ -65,9 +65,19 @@ route.get('/doctor/holiday-list', auth, DoctorController.holiday_list);
 // Booking slot
 route.post('/booking/time-list', auth, PatientController.time_list);
 route.post('/booking/booking', auth, PatientController.booking);
+route.post('/booking/cancel', auth, PatientController.cancel_booking);
 
 route.get('/admin/request-list', auth, PatientController.request_list);
 route.post('/admin/assign-doctor', auth, PatientController.assign_doctor);
+
+route.post('/doctor/feedback', auth, DoctorController.feedback_booking);
+
+//Re-schedule
+route.post('/doctor/apply-re_schedule', auth, DoctorController.apply_reschedule);
+route.get('/admin/re_schedule-list', auth, DoctorController.re_schedule_list);
+route.post('/admin/re_schedule-confirm', auth, DoctorController.re_schedule_confirm);
+route.post('/admin/confirm-re_schedule-booking', auth, PatientController.confirm_reschedule_booking);
+
 
 
 

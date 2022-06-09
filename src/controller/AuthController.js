@@ -336,15 +336,16 @@ exports.block_user = async (req, res, next) => {
 exports.edit_profile = async(req,res,next)=>{
 
     const schema = joi.object({
-        age:joi.number().required(),
-        address : joi.string().required(),
+        age: joi.string().allow(null),
+        address: joi.string().allow(null),
         first_name: joi.string().required(),
         last_name: joi.string().required(),
         specility : joi.string().allow(null),
         experience : joi.string().allow(null),
         education: joi.string().allow(null),
         qualification: joi.string().allow(null),
-        gender : joi.string().required().valid('Male','Female','other')
+        gender : joi.string().required().valid('Male','Female','other'),
+        user_id : joi.string().required()
     });
 
     try {
@@ -352,7 +353,7 @@ exports.edit_profile = async(req,res,next)=>{
         await schema.validateAsync(req.body);
 
         const check = await user.findOne({
-            where : { id : req.user_id }
+            where : { id : req.body.user_id }
         });
 
         if(!check) throw new Error('user not found');

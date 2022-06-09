@@ -43,7 +43,7 @@ user_profile.init(
 
 );
 
-user.hasMany(user_profile, { onDelete: "CASCADE", foreignKey: "user_id" });
+user.hasOne(user_profile, { onDelete: "CASCADE", foreignKey: "user_id" });
 user_profile.belongsTo(user, { foreignKey: "user_id" });
 
 

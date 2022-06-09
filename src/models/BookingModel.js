@@ -23,11 +23,21 @@ booking.init(
             allowNull: false
         },
         status: {
-            type: DataTypes.ENUM('pending', 'accepted','reject'),
+            type: DataTypes.ENUM('pending', 'accepted','reject','cancel'),
             allowNull: false,
             defaultValue: 'pending',
         },
+        is_come: {
+            type: DataTypes.ENUM('0', '1'),
+            allowNull: false,
+            defaultValue: '0',
+            comment:"0 is for not come and 1 is for come"
+        },
         reason: {
+            type: DataTypes.TEXT,
+            allowNull: true
+        },
+        feedback: {
             type: DataTypes.TEXT,
             allowNull: true
         },
@@ -41,8 +51,8 @@ booking.init(
 
 );
 
-s_date.hasOne(booking, { onDelete: "CASCADE", foreignKey: "s_date_id" });
-booking.belongsTo(s_date, { foreignKey: "s_date_id" });
+s_date.hasOne(booking, { onDelete: "CASCADE", foreignKey: "sch_id" });
+booking.belongsTo(s_date, { foreignKey: "sch_id" });
 
 user.hasMany(booking, { onDelete: "CASCADE", foreignKey: "doctor_id" });
 booking.belongsTo(user, { foreignKey: "doctor_id" });
