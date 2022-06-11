@@ -1,5 +1,6 @@
 const { Model, DataTypes } = require('sequelize');
 const database = require('../database');
+const clinic = require('./ClinicModel')
 
 class user extends Model { }
 
@@ -73,5 +74,7 @@ user.init(
 
 );
 
+clinic.hasMany(user, { onDelete: "CASCADE", foreignKey: "clinic_id" });
+user.belongsTo(clinic, { foreignKey: "clinic_id" } )
 
 module.exports = user;

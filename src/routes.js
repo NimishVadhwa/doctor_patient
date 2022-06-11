@@ -31,6 +31,8 @@ let upload_user = multer({
 });
 
 //auth 
+route.get('/verify/email/:id', AuthController.verify_email);
+
 route.post('/auth/login', AuthController.login);
 route.post('/auth/admin-login', AuthController.admin_login); // Admin login 
 route.post('/auth/register', AuthController.register);

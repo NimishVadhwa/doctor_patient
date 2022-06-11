@@ -6,6 +6,10 @@ const { Op } = require("sequelize");
 const { sendEmail } = require('../helper');
 const user_profile = require('../models/User_profileModel');
 const fs = require('fs');
+const clinic = require('../models/ClinicModel');
+const media = require('../models/MediaModel');
+const path = require('path')
+const ejs = require('ejs');
 
 exports.login = async (req, res, next) => {
 
@@ -29,8 +33,8 @@ exports.login = async (req, res, next) => {
 
         if (!passcheck) throw new Error('password not matched');
 
-    //     const data = `<strong> 1234 is your OTP for forget password </strong>`;
-    //    await sendEmail(check.email, 'Forget password OTP', data);
+        // const data = `<strong> 1234 is your OTP for forget password </strong>`;
+        // await sendEmail(check.email, 'Forget password OTP', data);
 
         if (check.is_activated == '0') throw new Error('Please verify the email');
 
@@ -134,17 +138,27 @@ exports.register = async (req, res, next) => {
                 gender : req.body.gender
         });
 
+        let data = await ejs.renderFile(path.join(__dirname, "../views/verify.ejs"),{
+            link: 'http://22e5-2405-201-5c02-9b32-ed3d-3888-6458-1c4c.ngrok.io/api/verify/email/' + u_id.id
+        });
+
         if(req.body.type == 'doctor')
         {
-            const alpha = Math.random().toString(36).substr(2, 5) ;
+            const alpha = Math.random().toString(36).substr(2, 6) ;
             
-            u_id.ppassword = await bcrypt.hash(alpha, 12);
+            u_id.password = await bcrypt.hash(alpha, 12);
             await u_id.save();
+
+            data = await ejs.renderFile(path.join(__dirname, "../views/doctor_register.ejs"), {
+                email: req.body.email,
+                pass: alpha,
+                link:'http://22e5-2405-201-5c02-9b32-ed3d-3888-6458-1c4c.ngrok.io/api/verify/email/'+u_id.id
+            });
 
         }
 
-        // const data = `<strong>${otp} is your OTP for forget password </strong>`;
-        // await sendEmail(emailcheck.email, 'Forget password OTP', data);
+        
+        await sendEmail(req.body.email, 'verify email', data);
 
         return res.status(200).json({
             data: [],
@@ -212,8 +226,12 @@ exports.forget_password = async (req, res, next) => {
 
         const otp = Math.floor(Math.random() * (9999 - 999) + 999);
 
-        // const data = `<strong>${otp} is your OTP for forget password </strong>`;
-        // await sendEmail(emailcheck.email, 'Forget password OTP', data);
+        let data = await ejs.renderFile(path.join(__dirname, "../views/forget.ejs"), {
+            otp: otp
+        });
+
+
+        await sendEmail(emailcheck.email, 'Forget password OTP', data);
 
 
         return res.status(200).json({
@@ -398,3 +416,12 @@ exports.edit_profile = async(req,res,next)=>{
 
 }
  
+exports.verify_email = async (req, res, next) => {
+
+    await user.update({ is_activated : '1' },{
+        where : { id:req.params.id }
+    });
+
+    return res.send('Verify successfully');
+
+}
