@@ -153,7 +153,7 @@ exports.register = async (req, res, next) => {
             data = await ejs.renderFile(path.join(__dirname, "../views/doctor_register.ejs"), {
                 email: req.body.email,
                 pass: alpha,
-                link:'http://168.235.81.206:7100/api/verify/email/'+u_id.id
+                link:'http://22e5-2405-201-5c02-9b32-ed3d-3888-6458-1c4c.ngrok.io/api/verify/email/'+u_id.id
             });
 
         }
@@ -376,13 +376,12 @@ exports.edit_profile = async(req,res,next)=>{
         });
 
         if(!check) throw new Error('user not found');
-
+        
         check.first_name = req.body.first_name;
         check.last_name = req.body.last_name;
-
+        
         if(req.file)
         {
-            
             check.image = req.file.path;
             await check.save();
         }

@@ -7,7 +7,7 @@ const user_profile = require('../models/User_profileModel');
 const re_schedule = require('../models/Re_scheduleModel');
 const question = require('../models/QuestionsModel');
 const answer = require('../models/AnswerModel');
-const user_anwser = require('../models/UserAnswerModel');
+
 
 exports.time_list = async (req, res, next) => {
 
@@ -234,85 +234,3 @@ exports.cancel_booking = async(req, res, next)=>{
 
 }
 
-exports.all_questions = async(req,res,next)=>{
-    
-    try{
-        
-        const data = await question.findAll({
-            include:[{
-                model : answer
-            }]
-        });
-        
-        return res.status(200).json({
-            data: data,
-            status: true,
-            message: "Questions with all options"
-        });
-        
-    }
-    catch(err){
-        err.status = 500;
-        next(err);
-    }
-    
-}
-
-exports.add_user_answer = async(req,res,next)=>{
-    
-    const schema = joi.object({
-        question_id: joi.number().required(),
-        answer_id: joi.number().required()
-    })
-
-    try {
-        
-        await schema.validateAsync(req.body);
-
-        await user_anwser.create({
-            user_id : req.user_id,
-            answer_id : req.body.answer_id,
-            question_id : req.body.question_id
-        });
-
-        return res.status(200).json({
-            data: [],
-            status: true,
-            message: "Answer add successfully"
-        });
-
-    } catch (err) {
-        err.status = 400;
-        next(err);
-    }
-
-    
-}
-
-exports.get_answer = async(req,res,next)=>{
-
-    try {
-
-        const data = await user_anwser.findAll({
-            where : { user_id  : req.user_id },
-            include:[{
-                model : question
-            },
-            {
-                model : answer
-            }]
-        })
-
-        return res.status(200).json({
-            data: data,
-            status: true,
-            message: "All answers of the patient"
-        });
-
-    } catch (err) {
-        err.status = 400;
-        next(err);
-    }
-
-    
-}

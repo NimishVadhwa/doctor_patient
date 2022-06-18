@@ -75,17 +75,10 @@ route.post('/admin/assign-doctor', auth, PatientController.assign_doctor);
 
 route.post('/doctor/feedback', auth, DoctorController.feedback_booking);
 
-//question
-route.get('/patient/question-list', PatientController.all_questions);
-route.post('/patient/add-answer',auth, PatientController.add_user_answer);
-route.post('/patient/get-answer',auth, PatientController.get_answer);
-
 //Re-schedule
-route.post('/doctor/apply-re_schedule-by-slot', auth, DoctorController.apply_reschedule_by_slot);
-route.post('/doctor/apply-re_schedule-by-date', auth, DoctorController.apply_reschedule_by_date);
-
+route.post('/doctor/apply-re_schedule', auth, DoctorController.apply_reschedule);
 route.get('/admin/re_schedule-list', auth, DoctorController.re_schedule_list);
-route.post('/admin/re_schedule-confirm', auth, DoctorController.re_schedule_confirm_by_slot);
+route.post('/admin/re_schedule-confirm', auth, DoctorController.re_schedule_confirm);
 route.post('/admin/confirm-re_schedule-booking', auth, PatientController.confirm_reschedule_booking);
 
 

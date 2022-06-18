@@ -5,8 +5,6 @@ const calender = require('../models/Calender_dateModel');
 const user_profile = require('../models/User_profileModel');
 const booking = require('../models/BookingModel');
 const re_schedule = require('../models/Re_scheduleModel');
-const re_schedule_date = require('../models/Re_scheduleDateModel');
-
 
 exports.add_schedule = async (req, res, next) => {
    
@@ -127,20 +125,20 @@ exports.add_schedule = async (req, res, next) => {
 exports.schedule_list_doctor = async (req, res, next) => {
 
     const schema = joi.object({
-        doctor_id : joi.number().required(),
-        month : joi.number().required(),
+        doctor_id: joi.number().required(),
+        month: joi.number().required(),
         year: joi.number().required()
     });
 
     try {
-        
+
         await schema.validateAsync(req.body);
 
         const data = await calender.findAll({
-            where : { year : req.body.year, month : req.body.month },
-            include:[{
-                model : schedule,
-                where : { doctor_id : req.body.doctor_id },
+            where: { year: req.body.year, month: req.body.month },
+            include: [{
+                model: schedule,
+                where: { doctor_id: req.body.doctor_id },
                 include: [{
                     model: booking,
                     include: [{
@@ -150,7 +148,7 @@ exports.schedule_list_doctor = async (req, res, next) => {
             }]
         });
 
-    
+
         return res.status(200).json({
             data: data,
             status: true,
@@ -164,11 +162,11 @@ exports.schedule_list_doctor = async (req, res, next) => {
 
 }
 
-exports.calender = async(req, res, next)=>{
+exports.calender = async (req, res, next) => {
 
     const schema = joi.object({
-        month:joi.number().required(),
-        year:joi.number().required()
+        month: joi.number().required(),
+        year: joi.number().required()
     });
 
     try {
@@ -192,7 +190,7 @@ exports.calender = async(req, res, next)=>{
             status: true,
             message: "Schedule list by date"
         });
-        
+
     } catch (err) {
         err.status = 400;
         next(err);
@@ -200,14 +198,14 @@ exports.calender = async(req, res, next)=>{
 
 }
 
-exports.get_doctor_list = async(req, res, next)=>{
+exports.get_doctor_list = async (req, res, next) => {
 
     const schema = joi.object({
-        date : joi.string().required()
+        date: joi.string().required()
     });
 
     try {
-        
+
         await schema.validateAsync(req.body);
 
         let dta = new Date(req.body.date);
@@ -216,8 +214,7 @@ exports.get_doctor_list = async(req, res, next)=>{
             where: { date: dta.toISOString().split('T')[0] },
         });
 
-        if(!cal)
-        {
+        if (!cal) {
             return res.status(200).json({
                 data: [],
                 status: true,
@@ -227,10 +224,10 @@ exports.get_doctor_list = async(req, res, next)=>{
 
         const data = await schedule.findAll({
             where: { calender_id: cal.id },
-            attributes:['doctor_id'],
-            group:['doctor_id'],
+            attributes: ['doctor_id'],
+            group: ['doctor_id'],
             include: [{
-                model:user
+                model: user
             }]
         });
 
@@ -247,22 +244,22 @@ exports.get_doctor_list = async(req, res, next)=>{
 
 }
 
-exports.get_doctor_slot_list = async(req, res, next)=>{
+exports.get_doctor_slot_list = async (req, res, next) => {
 
     const schema = joi.object({
-        start_time : joi.string().required(),
+        start_time: joi.string().required(),
         end_time: joi.string().required(),
         cal_id: joi.number().required(),
     });
 
     try {
-        
+
         await schema.validateAsync(req.body);
 
         const data = await schedule.findAll({
-            where : { calender_id : req.body.cal_id, start_time : req.body.start_time, end_time : req.body.end_time },
-            include:[{
-                model:user
+            where: { calender_id: req.body.cal_id, start_time: req.body.start_time, end_time: req.body.end_time },
+            include: [{
+                model: user
             }]
         });
 
@@ -279,23 +276,22 @@ exports.get_doctor_slot_list = async(req, res, next)=>{
 
 }
 
-exports.schedule_by_single_date= async (req, res, next) => {
+exports.schedule_by_single_date = async (req, res, next) => {
 
     const schema = joi.object({
-        doctor_id : joi.number().required(),
-        date:joi.string().required()
+        doctor_id: joi.number().required(),
+        date: joi.string().required()
     });
 
     try {
-        
+
         await schema.validateAsync(req.body);
 
         const cal = await calender.findOne({
-            where : { date: req.body.date}
+            where: { date: req.body.date }
         });
 
-        if(!cal) 
-        {
+        if (!cal) {
             return res.status(200).json({
                 data: [],
                 status: true,
@@ -305,14 +301,14 @@ exports.schedule_by_single_date= async (req, res, next) => {
 
         const data = await schedule.findAll({
             where: { doctor_id: req.body.doctor_id, calender_id: cal.id },
-            include:[{
-                model:booking,
-                include:[{
-                    model:user
+            include: [{
+                model: booking,
+                include: [{
+                    model: user
                 }]
             }]
         });
-        
+
         return res.status(200).json({
             data: data,
             status: true,
@@ -320,7 +316,7 @@ exports.schedule_by_single_date= async (req, res, next) => {
         });
 
     } catch (err) {
-        err.status= 400;
+        err.status = 400;
         next(err);
     }
 
@@ -329,7 +325,7 @@ exports.schedule_by_single_date= async (req, res, next) => {
 exports.add_holiday = async (req, res, next) => {
 
     const schema = joi.object({
-        date : joi.string().required()
+        date: joi.string().required()
     });
 
     try {
@@ -344,20 +340,19 @@ exports.add_holiday = async (req, res, next) => {
                 date: dta.toISOString().split('T')[0],
                 year: dta.getFullYear(),
                 month: dta.getMonth() + 1,
-                is_holiday : '1'
+                is_holiday: '1'
             }
         });
 
-        if(!created)
-        {
+        if (!created) {
             const check = await schedule.findOne({
                 where: { calender_id: row.id }
             });
 
-            if(check) throw new Error('Schedule is added');
+            if (check) throw new Error('Schedule is added');
 
-            await calender.update({ is_holiday:'1' },{
-                where: { id:row.id }
+            await calender.update({ is_holiday: '1' }, {
+                where: { id: row.id }
             })
         }
 
@@ -366,7 +361,7 @@ exports.add_holiday = async (req, res, next) => {
             status: true,
             message: "Holiday added successfully"
         });
-        
+
     } catch (err) {
         err.status = 400;
         next(err);
@@ -374,16 +369,16 @@ exports.add_holiday = async (req, res, next) => {
 
 }
 
-exports.remove_holiday = async(req,res,next)=>{
+exports.remove_holiday = async (req, res, next) => {
 
     const schema = joi.object({
-        holiday_id : joi.number().required()
+        holiday_id: joi.number().required()
     });
 
     try {
         await schema.validateAsync(req.body);
 
-        await calender.update({ is_holiday:'0' },{
+        await calender.update({ is_holiday: '0' }, {
             where: { id: req.body.holiday_id }
         });
 
@@ -392,7 +387,7 @@ exports.remove_holiday = async(req,res,next)=>{
             status: true,
             message: "Holiday remove successfully"
         });
-       
+
     } catch (err) {
         err.status = 400;
         next(err);
@@ -400,12 +395,12 @@ exports.remove_holiday = async(req,res,next)=>{
 
 }
 
-exports.holiday_list = async(req, res, next)=>{
+exports.holiday_list = async (req, res, next) => {
 
     try {
-        
+
         const data = await calender.findAll({
-            where : { is_holiday : '1'}
+            where: { is_holiday: '1' }
         });
 
         return res.status(200).json({
@@ -421,19 +416,19 @@ exports.holiday_list = async(req, res, next)=>{
 
 }
 
-exports.apply_reschedule_by_slot = async (req, res, next) => {
+exports.apply_reschedule = async (req, res, next) => {
 
     const schema = joi.object({
-        start_time : joi.string().required(),
+        start_time: joi.string().required(),
         end_time: joi.string().required(),
-        user_id : joi.number().required(),
-        slot_id : joi.number().allow(null),
-        re_schedule_date : joi.string().required(),
-        booking_id : joi.number().allow(null)
+        user_id: joi.number().required(),
+        slot_id: joi.number().allow(null),
+        re_schedule_date: joi.string().required(),
+        booking_id: joi.number().allow(null)
     });
 
     try {
-        
+
         await schema.validateAsync(req.body);
 
         let dta = new Date(req.body.re_schedule_date);
@@ -448,12 +443,12 @@ exports.apply_reschedule_by_slot = async (req, res, next) => {
         });
 
         await re_schedule.create({
-            old_start_time : req.body.start_time,
+            old_start_time: req.body.start_time,
             old_end_time: req.body.end_time,
-            calender_id : row.id,
-            schedule_id : req.body.slot_id,
-            user_id :req.body.user_id,
-            booking_id : req.body.booking_id
+            calender_id: row.id,
+            schedule_id: req.body.slot_id,
+            user_id: req.body.user_id,
+            booking_id: req.body.booking_id
         });
 
         return res.status(200).json({
@@ -461,7 +456,7 @@ exports.apply_reschedule_by_slot = async (req, res, next) => {
             status: true,
             message: "Re-schedule apply successfully"
         });
-        
+
     } catch (err) {
         err.status = 400;
         next(err);
@@ -470,37 +465,19 @@ exports.apply_reschedule_by_slot = async (req, res, next) => {
 
 }
 
-exports.apply_reschedule_by_date = async(req, res, next)=>{
-
-    const schema = joi.object({
-        date : joi.array.required(),
-    });
-
-    try {
-        await schema.validateAsync(req.body);
-
-
-
-    } catch (err) {
-        err.status = 400;
-        next(err);
-    }
-
-}
-
-exports.re_schedule_list = async(req, res, next)=>{
+exports.re_schedule_list = async (req, res, next) => {
 
     try {
 
         const data = await re_schedule.findAll({
-            where : { is_reschedule:'0' },
+            where: { is_reschedule: '0' },
             include: [{
-                model:booking
-            },{
-                model : user
+                model: booking
+            }, {
+                model: user
             }]
         });
-        
+
         return res.status(200).json({
             data: data,
             status: true,
@@ -508,17 +485,17 @@ exports.re_schedule_list = async(req, res, next)=>{
         });
 
     } catch (err) {
-        err.status =400;
+        err.status = 400;
         next(err);
     }
 
 }
 
-exports.re_schedule_confirm_by_slot = async (req, res, next) => {
+exports.re_schedule_confirm = async (req, res, next) => {
 
     const schema = joi.object({
-        re_schedule_id : joi.number().required(),
-        status : joi.string().required().valid('1','2')
+        re_schedule_id: joi.number().required(),
+        status: joi.string().required().valid('1', '2')
     });
 
     try {
@@ -529,8 +506,7 @@ exports.re_schedule_confirm_by_slot = async (req, res, next) => {
 
         const data = await schedule.findOne({ where: { id: check.schedule_id } });
 
-        if(req.body.status == '1')
-        {
+        if (req.body.statsu == '1') {
             let st_time = data.start_time;
             let ed_time = data.end_time;
             let cal_id = data.calender_id;
@@ -538,7 +514,7 @@ exports.re_schedule_confirm_by_slot = async (req, res, next) => {
             data.start_time = check.old_start_time;
             data.end_time = check.old_end_time;
             await data.save();
-    
+
             check.old_start_time = st_time;
             check.old_end_time = ed_time;
             check.calender_id = cal_id;
@@ -549,7 +525,7 @@ exports.re_schedule_confirm_by_slot = async (req, res, next) => {
         check.is_reschedule = req.body.status;
         await check.save();
 
-        
+
         return res.status(200).json({
             data: [],
             status: true,
@@ -575,7 +551,7 @@ exports.feedback_booking = async (req, res, next) => {
 
         await booking.update({
             feedback: req.body.feedback,
-            is_come : '1'
+            is_come: '1'
         }, {
             where: { id: req.body.booking_id }
         });
