@@ -63,6 +63,10 @@ user.init(
             type: DataTypes.ENUM('doctor', 'patient', 'admin'),
             allowNull: false,
             defaultValue: 'patient'
+        },
+        rating: {
+            type: DataTypes.TEXT,
+            allowNull: true
         }
     },
     {

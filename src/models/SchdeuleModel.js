@@ -20,6 +20,12 @@ schedule.init(
         end_time: {
             type: DataTypes.TIME,
             allowNull: false
+        },
+        status: {
+            type: DataTypes.ENUM('0', '1'),
+            allowNull: false,
+            defaultValue: '0',
+            comment:"1 is for schedule not available and 0 is for available"
         }
     },
     {

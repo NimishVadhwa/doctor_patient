@@ -1,5 +1,6 @@
 const { Model, DataTypes } = require('sequelize');
 const database = require('../database');
+const booking = require('./BookingModel.js');
 
 class media extends Model { }
 
@@ -16,7 +17,7 @@ media.init(
             allowNull: false
         },
         type: {
-            type: DataTypes.ENUM('banner'),
+            type: DataTypes.ENUM('banner','report'),
             allowNull: false,
             defaultValue: 'banner',
         }
@@ -31,5 +32,7 @@ media.init(
 
 );
 
+booking.hasOne(media, { onDelete: "CASCADE", foreignKey: "booking_id" });
+media.belongsTo(booking,{ foreignKey: "booking_id" });
 
 module.exports = media;

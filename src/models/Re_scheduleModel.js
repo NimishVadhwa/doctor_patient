@@ -15,19 +15,15 @@ re_schedule.init(
             allowNull: false,
             primaryKey: true
         },
-        old_start_time: {
-            type: DataTypes.TIME,
-            allowNull: false
-        },
-        old_end_time: {
-            type: DataTypes.TIME,
-            allowNull: false
-        },
-        is_reschedule: {
-            type: DataTypes.ENUM('0', '1','2'),
+        status: {
+            type: DataTypes.ENUM('pending', 'accept','cancel'),
             allowNull: false,
-            defaultValue: '0',
-            comment: "0 is for requesting the re-schedule and 1 is for accept the reschedule and 2 is for cancel the re-schedule"
+            defaultValue: 'pending',
+            comment: "pending is for requesting the re-schedule and accept is for accept the reschedule and cancel is for cancel the re-schedule"
+        },
+        reason: {
+            type: DataTypes.TEXT,
+            allowNull: true
         }
     },
     {
@@ -42,13 +38,13 @@ re_schedule.init(
 s_date.hasMany(re_schedule, { onDelete: "CASCADE", foreignKey: "calender_id" });
 re_schedule.belongsTo(s_date, { foreignKey: "calender_id" });
 
-booking.hasOne(re_schedule, { onDelete: "CASCADE", foreignKey: "booking_id" });
+booking.hasMany(re_schedule, { onDelete: "CASCADE", foreignKey: "booking_id" });
 re_schedule.belongsTo(booking, { foreignKey: "booking_id" });
 
 schedule.hasOne(re_schedule, { onDelete: "CASCADE", foreignKey: "schedule_id" });
 re_schedule.belongsTo(schedule, { foreignKey: "schedule_id" });
 
-user.hasMany(re_schedule, { onDelete: "CASCADE", foreignKey: "user_id" });
-re_schedule.belongsTo(user, { foreignKey: "user_id" });
+user.hasMany(re_schedule, { onDelete: "CASCADE", foreignKey: "doctor_id" });
+re_schedule.belongsTo(user, { foreignKey: "doctor_id" });
 
 module.exports = re_schedule;
