@@ -1,5 +1,5 @@
 const sgMail = require('@sendgrid/mail')
-sgMail.setApiKey('Api Key'); // vadhwanimish20@gmail.com
+sgMail.setApiKey('Api Key');
 
 var FCM = require('fcm-node');
 var serverKey = 'Server Key'; 
