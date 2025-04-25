@@ -1,8 +1,8 @@
 const sgMail = require('@sendgrid/mail')
-sgMail.setApiKey('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'); // vadhwanimish20@gmail.com
+sgMail.setApiKey('Api Key'); // vadhwanimish20@gmail.com
 
 var FCM = require('fcm-node');
-var serverKey = 'AAAAaNeHzGw:APA91bEhukPXs603HZEdyHzdgOARQKnlEHPu4toh2Yns6vPL2WbE3g582jN16lpCWKEOwt0zpu64dUD1BijMGhUZNHIQNZh6tDdzdNFhiDvOkITqGgRvkh73L4UuTZkIwHM8BAYx6Ph_'; 
+var serverKey = 'Server Key'; 
 
 var fcm = new FCM(serverKey);
 const notification = require('./models/NotificationModel');
